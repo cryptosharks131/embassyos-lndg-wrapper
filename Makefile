@@ -1,6 +1,4 @@
-ASSETS := $(shell yq e '.assets.[].src' manifest.yaml)
-ASSET_PATHS := $(addprefix assets/,$(ASSETS))
-VERSION := $(shell cat ./Dockerfile | head -n 1 | sed -e 's/^.*://')
+VERSION := $(shell yq e ".version" manifest.yaml)
 
 .DELETE_ON_ERROR:
 
@@ -9,8 +7,8 @@ all: lndg.s9pk
 install: lndg.s9pk
         embassy-cli package install lndg.s9pk
 
-lndg.s9pk: manifest.yaml config_spec.yaml config_rules.yaml image.tar instructions.md $(ASSET_PATHS)
-        embassy-sdk pack
+lndg.s9pk: manifest.yaml assets/compat/config_spec.yaml assets/compat/config_rules.yaml image.tar instructions.md
+        embassy-sdk pack lndg.s9pk
 
 instructions.md: README.md
         cp README.md instructions.md
